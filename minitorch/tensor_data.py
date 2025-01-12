@@ -69,6 +69,7 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
         out_index[i] = ordinal % shape[i]
         ordinal //= shape[i]
 
+# big shape broadcast to a small shape
 def broadcast_index(
     big_index: Index, big_shape: Shape, shape: Shape, out_index: OutIndex
 ) -> None:
@@ -88,14 +89,13 @@ def broadcast_index(
     Returns:
         None
     """
-    big_ordinal = 0
-
-    assert(len(big_index) == len(big_shape))
-    for idx, dim in zip(big_index, big_shape):
-        big_ordinal += idx * dim
-
-    to_index(big_ordinal, shape, out_index)
-
+    for i in range(len(shape)):
+        """
+        (3, 2, 5)
+           (2, 5)
+        """
+        offset = len(big_shape) - len(shape)
+        out_index[i] = big_index[i + offset] if big_shape[i + offset] == shape[i] else 0
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     """
@@ -118,7 +118,8 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     final_shape = [max(dim1, dim2) for dim1, dim2 in zip(shape1, shape2)]
 
     for i in range(len(final_shape)):
-        if final_shape[i] % shape1[i] == 0 and final_shape[i] % shape2[i] == 0:
+        # if final_shape[i] % shape1[i] == 0 and final_shape[i] % shape2[i] == 0:
+        if shape1[i] == shape2[i] or shape1[i] == 1 or shape2[i] == 1:
             continue
         raise IndexingError('shape1 and shape2 cannot broadcast')
 
