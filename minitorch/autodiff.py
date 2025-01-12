@@ -78,7 +78,7 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
     # must use dfs to process topsort
     def dfs(scalar: Variable) -> None:
         if scalar.is_constant():
-            # scalar_set.add(scalar.unique_id)
+            scalar_set.add(scalar.unique_id)
             return 
         
         if scalar.is_leaf():
@@ -117,10 +117,11 @@ def backpropagate(variable: Variable, deriv: Any) -> None:
             scalar_value_sub_lst = it.chain_rule(scalar_dict[it.unique_id])
             for scalar, value in scalar_value_sub_lst:
                 idx = scalar.unique_id
-                # if idx in scalar_dict:
-                scalar_dict[idx] += value
-                # else:
-                    # scalar_dict[idx] = value
+                if idx in scalar_dict:
+                    scalar_dict[idx] += value
+                else:
+                    continue # must is constant
+                    scalar_dict[idx] = value
 
 
 @dataclass
