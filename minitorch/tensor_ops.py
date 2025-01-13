@@ -84,6 +84,7 @@ class TensorBackend:
         self.eq_zip = ops.zip(operators.eq)
         self.is_close_zip = ops.zip(operators.is_close)
         self.relu_back_zip = ops.zip(operators.relu_back)
+        self.sigmoid_back_zip = ops.zip(operators.sigmoid_back)
         self.log_back_zip = ops.zip(operators.log_back)
         self.inv_back_zip = ops.zip(operators.inv_back)
 
