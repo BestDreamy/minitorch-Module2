@@ -116,7 +116,7 @@ class Sigmoid(Function):
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
-        t1 = ctx.saved_values
+        (t1,) = ctx.saved_values
         return t1.f.sigmoid_back_zip(t1, grad_output)
 
 
@@ -206,7 +206,8 @@ class IsClose(Function):
 class Permute(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, order: Tensor) -> Tensor:
-        return Tensor(a._tensor.permute(order))
+        print(order.tuple())
+        return minitorch.Tensor(*a._tensor.permute(tuple(order.tuple()[0])), backend=a.backend)
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
