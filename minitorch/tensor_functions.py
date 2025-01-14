@@ -8,6 +8,7 @@ import random
 from typing import TYPE_CHECKING
 
 import numpy as np
+import copy
 
 import minitorch
 
@@ -206,13 +207,23 @@ class IsClose(Function):
 class Permute(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, order: Tensor) -> Tensor:
-        print(order.tuple())
-        return minitorch.Tensor(*a._tensor.permute(tuple(order.tuple()[0])), backend=a.backend)
+        order_lst = order.tuple()[0]
+        order_lst = [int(it) for it in order_lst]
+        # order_lst = [int(order[i]) for i in range(order.size)]
+        # print(f"order_lst: {tuple(order_lst)}")
+
+        reorder = copy.deepcopy(order_lst)
+        for i, it in enumerate(order_lst):
+            reorder[it] = i
+        ctx.save_for_backward(reorder)
+
+        return a._new(a._tensor.permute(*order_lst))
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
-        # TODO: Implement for Task 2.4.
-        raise NotImplementedError("Need to implement for Task 2.4")
+        (order_lst,) = ctx.saved_values
+        # print(f"order in backward: {tuple(order)}")
+        return grad_output._new(grad_output._tensor.permute(*order_lst)), 0.0
 
 
 class View(Function):

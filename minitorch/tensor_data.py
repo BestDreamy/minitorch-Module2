@@ -240,6 +240,8 @@ class TensorData:
         Returns:
             New `TensorData` with the same storage and a new dimension order.
         """
+        # print(f"order in permute function: {order}")
+
         assert list(sorted(order)) == list(
             range(len(self.shape))
         ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
